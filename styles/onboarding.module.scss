@@ -1,0 +1,18 @@
+.onboardingContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Geist', sans-serif;
+}
+
+.onboardingCard {
+  width: 100%;
+  min-height: 450px;
+}
+
+.onboardingTitle {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-family: 'Geist', sans-serif;
+}

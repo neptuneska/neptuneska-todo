@@ -1,0 +1,43 @@
+
+services:
+  mysql-todo:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+
+  phpmyadmin-todo:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql-todo
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql-todo
+      PMA_USER: test
+      PMA_PASSWORD: test
+    restart: unless-stopped
+
+  redis-todo:
+    image: redis/redis-stack:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  clickhouse-todo:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: test
+      CLICKHOUSE_USER: test
+      CLICKHOUSE_PASSWORD: test
