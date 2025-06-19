@@ -1,3 +1,5 @@
+const isProd = process.env.NODE_ENV === 'production';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
@@ -27,18 +29,22 @@ const nextConfig = {
             key: 'X-Frame-Options',
             value: 'DENY',
           },
-          {
-            key: 'Content-Security-Policy',
-            value: `
-              default-src 'self';
-              script-src 'self';
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' data:;
-              font-src 'self';
-              object-src 'none';
-              frame-ancestors 'none';
-            `.replace(/\s{2,}/g, ' ').trim(),
-          },
+          ...(isProd
+            ? [
+                {
+                  key: 'Content-Security-Policy',
+                  value: `
+                    default-src 'self';
+                    script-src 'self';
+                    style-src 'self' 'unsafe-inline';
+                    img-src 'self' data:;
+                    font-src 'self';
+                    object-src 'none';
+                    frame-ancestors 'none';
+                  `.replace(/\s{2,}/g, ' ').trim(),
+                },
+              ]
+            : []),
         ],
       },
     ];
