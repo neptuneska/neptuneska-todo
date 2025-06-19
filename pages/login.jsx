@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getCookie } from 'cookies-next';
 import { useRouter } from 'next/router'; 
 import axios from 'axios';
 import {
@@ -21,13 +22,21 @@ export default function LoginPage() {
 
   useEffect(() => {
     async function verifyToken() {
+      const token = getCookie('token');
+
+      if (!token) {
+        setCheckingToken(false); // Pas de token = pas besoin d'appeler l'API
+        return;
+      }
+
       try {
-        await axios.get('/api/verifytoken', { withCredentials: true });
+        await axios.get('/api/verify-token', { withCredentials: true });
         router.replace('/dashboard');
       } catch {
         setCheckingToken(false);
       }
     }
+
     verifyToken();
   }, [router]);
 
