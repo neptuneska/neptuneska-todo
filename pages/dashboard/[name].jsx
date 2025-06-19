@@ -301,9 +301,9 @@ export async function getServerSideProps(context) {
     });
 
     if (pageRes.status === 404) {
-      return {
+            return {
         redirect: {
-          destination: '/404',
+          destination: '/login',
           permanent: false,
         },
       };
