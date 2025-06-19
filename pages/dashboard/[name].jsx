@@ -301,7 +301,12 @@ export async function getServerSideProps(context) {
     });
 
     if (pageRes.status === 404) {
-      return { notFound: true };
+      return {
+        redirect: {
+          destination: '/404',
+          permanent: false,
+        },
+      };
     }
     const pageData = pageRes.data;
 
