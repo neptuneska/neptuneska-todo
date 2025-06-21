@@ -157,23 +157,6 @@ export default function NavLink({
           mb="sm"
         />
 
-        <TextInput
-          label="Icône (ex: Gauge, Fingerprint)"
-          placeholder="Nom icône"
-          value={formData.icon}
-          onChange={(e) => setFormData({ ...formData, icon: e.currentTarget.value })}
-          mb="sm"
-        />
-
-        <Group position="left" spacing="xs" mb="sm" align="center">
-          <label htmlFor="defaultOpened">Ouvert par défaut</label>
-          <input
-            id="defaultOpened"
-            type="checkbox"
-            checked={formData.defaultOpened}
-            onChange={(e) => setFormData({ ...formData, defaultOpened: e.currentTarget.checked })}
-          />
-        </Group>
 
         <Group position="right" mt="md">
           <Button onClick={handleCreate} disabled={!formData.label.trim()}>

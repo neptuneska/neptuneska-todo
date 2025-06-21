@@ -9,7 +9,6 @@ async function handler(req, res) {
 
   try {
     const { name, positions } = req.body;
-
     if (!name) return res.status(400).json({ error: 'Missing page name' });
     if (!Array.isArray(positions) || positions.length === 0) {
       return res.status(400).json({ error: 'Positions must be a non-empty array' });

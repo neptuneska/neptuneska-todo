@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus } from 'lucide-react';
+import { Plus, GripVertical } from 'lucide-react';
 import { TextInput, Checkbox } from '@mantine/core';
-import { GripVertical } from 'lucide-react';
 import { showNotification } from '@mantine/notifications';
 import styles from '../../styles/Name.module.scss';
 import Sidebar from '../../components/Sidebar';
@@ -27,7 +26,6 @@ import { useRouter } from 'next/router';
 
 function ErrorRedirect({ errorCode }) {
   const router = useRouter();
-
   useEffect(() => {
     if (errorCode === 401) {
       router.push('/login');
@@ -74,7 +72,7 @@ function SortableItem({ task, onToggle }) {
         title="Glisser pour déplacer"
       />
       <Checkbox
-        checked={task.finished}
+        checked={Boolean(task.finished)}
         label={task.label}
         onChange={() => onToggle(task.id)}
         sx={{
@@ -89,10 +87,10 @@ function SortableItem({ task, onToggle }) {
 
 export default function DashboardPage({ userId, pageData, todoData, errorCode }) {
   const [newTaskLabel, setNewTaskLabel] = useState('');
-  const [tasks, setTasks] = useState(todoData?.tasks || []);
-  const [order, setOrder] = useState(todoData?.order || []);
+  const [tasks, setTasks] = useState(() => todoData?.tasks || []);
+  const [order, setOrder] = useState(() => todoData?.order || []);
   const [todoTitle, setTodoTitle] = useState(todoData?.title || '');
-
+  const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
 
   if (errorCode === 401) return <ErrorRedirect errorCode={errorCode} />;
@@ -102,7 +100,7 @@ export default function DashboardPage({ userId, pageData, todoData, errorCode })
   const handleCloseContextMenu = () => setContextMenu(null);
   
   useEffect(() => {
-    if (!tasks.length) {
+    if (!Array.isArray(tasks) || tasks.length === 0) {
       showNotification({
         title: 'Info',
         message: 'Aucune liste de tâches disponible.',
@@ -130,6 +128,9 @@ export default function DashboardPage({ userId, pageData, todoData, errorCode })
         message: `La tâche "${newTaskLabel}" a été ajoutée avec succès.`,
         color: 'green',
       });
+
+      // Supprime router.reload() !
+      // router.reload();
     } catch (err) {
       console.error('Erreur ajout tâche:', err);
       showNotification({
@@ -150,11 +151,15 @@ export default function DashboardPage({ userId, pageData, todoData, errorCode })
       }, {
         headers: { 'x-task-id': task.id },
       });
+
       const updatedTodo = res.data;
 
-      setTasks(updatedTodo.tasks);
-      setOrder(updatedTodo.order);
-      setTodoTitle(updatedTodo.title);
+      // Ici, met à jour la tâche localement
+      setTasks(prevTasks =>
+        prevTasks.map(t =>
+          t.id === taskId ? { ...t, finished: !t.finished } : t
+        )
+      );
 
       showNotification({
         title: 'Tâche mise à jour',
@@ -214,7 +219,10 @@ export default function DashboardPage({ userId, pageData, todoData, errorCode })
   };
 
 
-  const sortedTasks = order.map(id => tasks.find(t => t.id === id)).filter(Boolean);
+  const sortedTasks = [
+    ...(order || []).map(id => (tasks || []).find(t => t.id === id)).filter(Boolean),
+    ...(tasks || []).filter(t => !(order || []).includes(t.id)),
+  ];
 
   return (
     <div className={styles.global} onClick={handleCloseContextMenu}>
@@ -242,7 +250,6 @@ export default function DashboardPage({ userId, pageData, todoData, errorCode })
 
         {sortedTasks.length > 0 ? (
           <>
-            <h2>{todoTitle}</h2>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
